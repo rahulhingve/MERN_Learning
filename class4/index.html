@@ -1,0 +1,65 @@
+<html>
+
+<body>
+    <input id="firstNum" type="text" placeholder="First number"></input> <br>
+    <input id="secondNum" type="text" placeholder="Second number"></input> <br>
+    <button onclick="calculate()">Calculate Sum</button>
+    <div id="finalSum"></div>
+    <br><br>
+    <input oninput="debounceCalculaeSum()" id="Principle" type="text" placeholder="Principle"></input><br>
+    <input oninput="debounceCalculaeSum()" id="Rate" type="text" placeholder="Rate"></input><br>
+    <input oninput="debounceCalculaeSum()" id="Time"  type="text" placeholder="Time"></input><br>
+    <!-- <button onclick="debounceCalculaeSum()">Calculate sum</button> -->
+    <div id="finalAns"></div>
+
+<script>
+    let timeout;
+   function debounceCalculaeSum(){
+    clearTimeout(timeout);
+    timeout =  setTimeout(function(){
+        calculateSum()
+    },700);
+    
+   }
+
+    async function calculateSum(){
+        const a = document.getElementById("Principle").value
+        const b = document.getElementById("Rate").value
+        const c = document.getElementById("Time").value
+        const response = await fetch("https://sum-server.100xdevs.com/interest?principal="+a+"&rate="+b+"&time="+c)
+        const ans = await response.text();
+
+        // ans= a*b*c/100;
+
+        document.getElementById("finalAns").innerHTML="simple intrest is:"+ans;
+    }
+</script>
+
+
+    <script>
+        // function calculate (){
+        //     const a = document.getElementById("firstNum").value
+        //     const b = document.getElementById("secondNum").value;
+        //     fetch("https://sum-server.100xdevs.com/sum?a="+a+"&b="+b)
+        //     .then(function(response){
+        //         response.text()
+        //         .then(function(ans){
+        //             document.getElementById("finalSum").innerHTML=ans;
+        //         })
+        //     })
+        // }
+        async function calculate() {
+            const a = document.getElementById("firstNum").value
+            const b = document.getElementById("secondNum").value;
+            const response = await fetch("https://sum-server.100xdevs.com/sum?a=" + a + "&b=" + b)
+            const ans = await response.text();
+            document.getElementById("finalSum").innerHTML = ans;
+
+        }
+        // const sum =  parseInt(a) + parseInt(b);
+        // document.getElementById("finalSum").innerText= sum;
+
+
+    </script>
+
+</html>
