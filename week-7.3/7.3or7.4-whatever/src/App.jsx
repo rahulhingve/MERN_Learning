@@ -3,7 +3,7 @@ import reactLogo from './assets/react.svg'
 import viteLogo from '/vite.svg'
 import './App.css'
 import { RecoilRoot, useRecoilState, useRecoilValue,  } from 'recoil'
-import { countAll, jobsAtom, messagingAtom, networkAtom, notificationAtom } from './atoms/atoms'
+import { allNetworkAtom,  totalNoti } from './atoms/atoms'
 
 function App() {
   
@@ -16,23 +16,19 @@ function App() {
 }
 
 function MainApp() {
-  const networkNotificationCount = useRecoilValue(networkAtom);
-  const jobsNotificationCount = useRecoilValue(jobsAtom);
-  const [messageCount,setMessageCount] = useRecoilState(messagingAtom);
-  const notificationCount = useRecoilValue(notificationAtom);
-  const totalCount = useRecoilValue(countAll)
+ const [notificationCount,setNotificationCount]= useRecoilState(allNetworkAtom);
+ const totalSum = useRecoilValue(totalNoti)
+
   return (
   <div>
   
 
       <button>Home</button>
-      <button>My Network{networkNotificationCount >= 100 ? "99+" : networkNotificationCount}</button>
-      <button>Jobs({jobsNotificationCount >= 100 ? "99+" : jobsNotificationCount})</button>
-      <button onClick={()=>{
-        setMessageCount(messageCount+1);
-      }}>Messages({messageCount >= 100 ? "99+" : messageCount})</button>
-      <button>Notification({notificationCount >= 100 ? "99+" : notificationCount})</button>
-      <button>Me ({ totalCount })</button>
+      <button>My Network{notificationCount.network >= 100 ? "99+" : notificationCount.network}</button>
+      <button>Jobs({notificationCount.jobs >= 100 ? "99+" : notificationCount.jobs})</button>
+      <button >Messages({notificationCount.messaging >= 100 ? "99+" : notificationCount.messaging})</button>
+      <button>Notification({notificationCount.notifications >= 100 ? "99+" : notificationCount.notifications})</button>
+      <button>Me ({ totalSum })</button>
 
     
   </div>
