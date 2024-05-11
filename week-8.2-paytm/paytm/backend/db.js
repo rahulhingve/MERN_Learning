@@ -1,6 +1,6 @@
-import mongoose from ("mongoose");
+const mongoose = require("mongoose")
 
-mongoose.connect("use your mongo url");
+mongoose.connect("ur mongo url");
 
 const userSchema =  new mongoose.Schema({
     username:String,

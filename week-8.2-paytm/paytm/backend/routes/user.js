@@ -1,11 +1,10 @@
 const express = require("express");
 const zod = require("zod");
-const { User } = require("../db")
+const { User , Account} = require("../db")
 const router = express.Router();
 const jwt = require("jsonwebtoken");
 const { JWT_SECRET } = require("../config");
 const { authMiddleware } = require("../middleware");
-app.use(express.json());
 
 
 const signUpScheme = zod.object({
@@ -16,16 +15,16 @@ const signUpScheme = zod.object({
 
 })
 
-router.post("/signup", async function (req, res) {
+router.post("/signup", async  (req, res)=> {
 
-    const body = req.body;
+    
 
 
     // this is very high lever hard to grasp
 
     // const {success} = signUpScheme.safeParse(req.body);
 
-    const parsedResult = signUpScheme.safeParse();
+    const parsedResult = signUpScheme.safeParse(req.body);
     const success = parsedResult.success;
     if (!success) {
         return res.status(411).json({
@@ -35,7 +34,7 @@ router.post("/signup", async function (req, res) {
     }
 
     const exUser = await User.findOne({
-        username: body.username
+        username: req.body.username
     })
 
     if (exUser) {
@@ -50,9 +49,16 @@ router.post("/signup", async function (req, res) {
         password: req.body.password,
         firstName: req.body.firstName,
         lastName: req.body.lastName,
+
+    })
+    const userId = user._id;
+    const randomBal = Math.random() * (10000 - 1) + 1;
+    await Account.create({
+        userId,
+        balance: randomBal
     })
 
-    const userId = user._id;
+
     const token = jwt.sign({
         userId
     }, JWT_SECRET)
@@ -76,7 +82,7 @@ router.post("/signin", async (req, res) => {
 
     const body = req.body;
 
-    const parsedResult = signInSchema.safeParse();
+    const parsedResult = signInSchema.safeParse(body);
     const success = parsedResult.success;
 
     if (!success) {
@@ -132,5 +138,37 @@ router.put("/", authMiddleware, async (req, res) => {
 
 
 })
+
+router.get("/bulk", authMiddleware, async (req, res) => {
+    const filter = req.query.filter || "";
+
+
+    const users = await User.find({
+
+        $or: [{
+            firstName: {
+                "$regex": filter
+            }
+
+        }, {
+            lastName: {
+                "$regex": filter
+            }
+        }]
+
+
+    })
+    res.status(200).json({
+        user: users.map(user => ({
+            username: user.username,
+            firstName: user.firstName,
+            lastName: user.lastName,
+            _id: user._id
+
+        }))
+    })
+
+})
+
 
 module.exports = router;

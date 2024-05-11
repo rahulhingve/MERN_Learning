@@ -1,8 +1,7 @@
-const express = require("express");
-const jwt = require("jsonwebtoken");
 const { JWT_SECRET } = require("./config");
+const jwt = require("jsonwebtoken");
 
-app.use(express.json());
+
 
 
 
@@ -14,7 +13,7 @@ const authMiddleware = (req, res, next) => {
 
     const auth = req.headers.authorization;
 
-    if (!auth || auth.startsWith('Bearer ')) {
+    if (!auth || !auth.startsWith('Bearer ')) {
         return res.status(403).json({});
 
     }

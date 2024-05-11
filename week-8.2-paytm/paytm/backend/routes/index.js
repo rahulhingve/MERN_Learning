@@ -1,10 +1,12 @@
 const express = require("express");
-const zod = require("zod");
+
 const userRoute = require("./user")
+const accountRouter = require("./account")
 const router = express.Router();
-app.use("api/v1/user", userRoute)
 
+router.use("/user", userRoute)
 
+router.use("/account", accountRouter)
 
 
 module.exports = router;
