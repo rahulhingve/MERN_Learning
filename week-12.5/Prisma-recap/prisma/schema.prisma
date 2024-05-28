@@ -13,20 +13,21 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-
-model User{
-  id Int @id @default(autoincrement())
-  username String @unique
-  password String
+model User {
+  id        Int     @id @default(autoincrement())
+  username  String  @unique
+  password  String
   firstName String
-  lastName String?
-  email String @unique
+  lastName  String?
+  email     String  @unique
+  todos     Todos[]
 }
 
 model Todos {
-  id Int @id @default(autoincrement())
-  title String
+  id          Int     @id @default(autoincrement())
+  title       String
   description String
-  done Boolean @default(false)
-  user_id Int 
+  done        Boolean @default(false)
+  user_id     Int
+  user        User @relation(fields: [user_id],references: [id])
 }
