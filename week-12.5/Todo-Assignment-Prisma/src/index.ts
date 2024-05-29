@@ -1,6 +1,7 @@
 import { PrismaClient } from "@prisma/client";
-import { any, string, z } from "zod"
-import express  from "express"
+import { any, boolean, string, z } from "zod"
+import express from "express"
+import { title } from "process";
 const prisma = new PrismaClient();
 
 const app = express();
@@ -17,7 +18,7 @@ const signupSchema = z.object({
 
 })
 
-app.post("/signup", async (req, res) =>{
+app.post("/signup", async (req, res) => {
 
     const parsedSchema = signupSchema.safeParse(req.body)
     const success = parsedSchema.success
@@ -36,36 +37,124 @@ app.post("/signup", async (req, res) =>{
         }
     })
 
-if(exUser){
-    return res.status(403).json({
-        msg:"email or username already taken use different"
-    })
-}
-
- await prisma.user.create({
-    data:{
-        username:req.body.username,
-        password:req.body.password,
-        email:req.body.email,
-        firstName:req.body.firstName,
-        lastName:req.body.lastName,
-       
-
+    if (exUser) {
+        return res.status(403).json({
+            msg: "email or username already taken use different"
+        })
     }
+
+    await prisma.user.create({
+        data: {
+            username: req.body.username,
+            password: req.body.password,
+            email: req.body.email,
+            firstName: req.body.firstName,
+            lastName: req.body.lastName,
+
+
+        }
+    })
+    res.json({
+        message: "User created successfully",
+
+
+    })
+    return;
+
+
 })
-res.json({
-    message: "User created successfully",
 
-    
+
+
+const todoSchema = z.object({
+    title: z.string(),
+    description: z.string(),
+    done: boolean().default(false)
 })
-return;
 
+
+
+app.post("/newtodo", async (req, res) => {
+
+    const parsedSchema = todoSchema.safeParse(req.body);
+    const success = parsedSchema.success;
+
+    if (!success) {
+        return res.status(403).json({
+            msg: "wrong inputs"
+        })
+    }
+
+    const username = req.headers.username as string;
+    const email = req.headers.email as string;
+    if (!username || !email) {
+        return res.json({
+            msg: "null field "
+        })
+    }
+
+    const user = await prisma.user.findUnique({
+        where: {
+            username: username,
+            email: email
+        }
+    })
+
+    if (!user) {
+        return res.status(404).json({
+            msg: "galat user"
+        })
+    }
+
+    await prisma.todos.create({
+
+        data: {
+
+            title: req.body.title,
+            description: req.body.description,
+            done: req.body.done,
+            userId: user.id,
+        }
+    })
+    res.json({
+        message: "Todo created successfully",
+
+
+    })
+    return;
 
 })
 
+app.get("/gettodos", async (req, res) => {
 
+    const username = req.headers.username as string;
+    const email = req.headers.email as string;
 
+    if (!username || !email) {
+        return res.json({
+            msg: "null field"
+        })
+    }
 
+    const user = await prisma.user.findUnique({
+        where: { username, email }
+    })
+
+    if (!user) {
+        return res.json({
+            msg: "u are not a user"
+        })
+    }
+
+    const todos = await prisma.todos.findMany({
+        where:{userId:user.id}
+})
+
+   return res.json({
+    todos
+   })
+
+})
 
 
 

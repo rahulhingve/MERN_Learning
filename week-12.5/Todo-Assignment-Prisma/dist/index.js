@@ -58,4 +58,71 @@ app.post("/signup", (req, res) => __awaiter(void 0, void 0, void 0, function* ()
     });
     return;
 }));
+const todoSchema = zod_1.z.object({
+    title: zod_1.z.string(),
+    description: zod_1.z.string(),
+    done: (0, zod_1.boolean)().default(false)
+});
+app.post("/newtodo", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const parsedSchema = todoSchema.safeParse(req.body);
+    const success = parsedSchema.success;
+    if (!success) {
+        return res.status(403).json({
+            msg: "wrong inputs"
+        });
+    }
+    const username = req.headers.username;
+    const email = req.headers.email;
+    if (!username || !email) {
+        return res.json({
+            msg: "null field "
+        });
+    }
+    const user = yield prisma.user.findUnique({
+        where: {
+            username: username,
+            email: email
+        }
+    });
+    if (!user) {
+        return res.status(404).json({
+            msg: "galat user"
+        });
+    }
+    yield prisma.todos.create({
+        data: {
+            title: req.body.title,
+            description: req.body.description,
+            done: req.body.done,
+            userId: user.id,
+        }
+    });
+    res.json({
+        message: "Todo created successfully",
+    });
+    return;
+}));
+app.get("/gettodos", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const username = req.headers.username;
+    const email = req.headers.email;
+    if (!username || !email) {
+        return res.json({
+            msg: "null field"
+        });
+    }
+    const user = yield prisma.user.findUnique({
+        where: { username, email }
+    });
+    if (!user) {
+        return res.json({
+            msg: "u are not a user"
+        });
+    }
+    const todos = yield prisma.todos.findMany({
+        where: { userId: user.id }
+    });
+    return res.json({
+        todos
+    });
+}));
 app.listen(3000);
