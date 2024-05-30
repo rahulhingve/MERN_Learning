@@ -45,8 +45,35 @@ app.post('/api/v1/user/signup', async (c) => {
 })
 
 
-app.post('/api/v1/user/signin', (c) => {
-  return c.text('signinnnnnnnn Hono!')
+app.post('/api/v1/user/signin', async (c) => {
+  const prisma = new PrismaClient({
+    datasourceUrl: c.env.DATABASE_URL,
+  }).$extends(withAccelerate());
+
+
+  const body = await c.req.json();
+try{
+  const user = await prisma.user.findUnique({
+    where:{email:body.email,password:body.password}
+   })
+   if(!user){
+    return c.json({
+      error:"wrong email and password"
+    })
+   }
+
+   const token  = await sign({id:user.id},c.env.SECRET_KEY)
+   return c.json({
+    token
+   })
+}catch(e){
+  return c.json({
+    error:"something went wrong"
+  })
+}
+
+
+
 })
 
 
