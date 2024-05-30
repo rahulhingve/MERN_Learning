@@ -11,6 +11,40 @@ const app = new Hono<{
   }
 }>()
 
+app.use('/api/v1/blog/*', async(c,next) => {
+
+
+try{
+  const header =  c.req.header("authorization");
+  if(!header){
+    return c.json({
+      error:"Plz Sign IN Again"
+    })
+  }
+  
+  const response = await verify(header,c.env.SECRET_KEY)
+  
+  if(response.id){
+    next();
+  }else{
+    c.status(403)
+    return c.json({
+      error :"Unauthorized"
+    })
+  }
+}catch(e){
+  c.status(403)
+  return c.json({
+    error:"Wrong Authorization Sign In Again"
+  })
+}
+
+
+
+
+   
+})
+
 app.post('/api/v1/user/signup', async (c) => {
   const prisma = new PrismaClient({
     datasourceUrl: c.env.DATABASE_URL,
