@@ -28,10 +28,10 @@ blogRouter.use('/*', async (c, next) => {
             })
         }
 
-        const response = await verify(header, c.env.SECRET_KEY)
+        const user = await verify(header, c.env.SECRET_KEY)
 
-        if (response.id) {
-            c.set("userId", response.id as string)
+        if (user) {
+            c.set("userId", user.id as string)
             await next();
         } else {
             c.status(403)
@@ -134,9 +134,20 @@ blogRouter.get('/bulk', async (c) => {
 
 
     try {
-        const blogTitle = await prisma.post.findMany();
+        const blogs = await prisma.post.findMany({
+            select:{
+                content:true,
+                title:true,
+                id:true,
+                author:{
+                    select:{
+                        name:true
+                    }
+                }
+            }
+        });
         return c.json({
-            blogTitle
+            blogs
         })
 
     } catch (e) {
@@ -155,7 +166,16 @@ blogRouter.get('/:id', async (c) => {
 
     try {
         const blog = await prisma.post.findFirst({
-            where: { id: id }
+            where: { id: id },
+            select:{
+                title:true,
+                content:true,
+                author:{
+                    select:{
+                        name:true
+                    }
+                }
+            }
 
         })
         return c.json({

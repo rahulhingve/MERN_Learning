@@ -41,7 +41,7 @@ userRouter.post('/signup', async (c) => {
         });
 
         const jwt = await sign({ id: user.id }, c.env.SECRET_KEY);
-        return c.json({ jwt })
+        return c.json(jwt)
     } catch (e) {
         c.status(403);
         return c.json({
@@ -82,9 +82,9 @@ userRouter.post('/signin', async (c) => {
         }
 
         const token = await sign({ id: user.id }, c.env.SECRET_KEY)
-        return c.json({
+        return c.json(
             token
-        })
+        )
     } catch (e) {
         return c.json({
             error: "something went wrong"
