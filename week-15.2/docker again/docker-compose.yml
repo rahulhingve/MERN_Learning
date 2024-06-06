@@ -1,0 +1,19 @@
+version: '3.3'
+services:
+  mongodb:
+    image: "mongo"
+    container_name: mongodb
+    ports:
+      - "27017:27017"
+    volumes:
+      - "mongodb_data:/data/db"
+  backed:
+    image: "rahul-node-app"
+    container_name: backend_app
+    ports:
+      - 3000:3000
+    environment:
+      MONGO_URL: "mongo://mongodb:27017" 
+
+volumes:
+  mongodb_data:     
