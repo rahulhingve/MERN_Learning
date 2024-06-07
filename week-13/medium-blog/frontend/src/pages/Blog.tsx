@@ -7,10 +7,11 @@ export function Blog(){
 
 const {id}=useParams();
     const {loading,blog}=useBlog({
-        id:id||""
+        id:id||"",
+    
     });
 
-    if (loading){
+    if (loading||!blog){
         return <div>
             <FullBlogSkeleton/>
         </div>

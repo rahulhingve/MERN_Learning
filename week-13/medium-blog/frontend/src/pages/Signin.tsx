@@ -1,5 +1,5 @@
 import { Auth } from "../components/Auth";
-import { Input } from "../components/input";
+
 import { Quote } from "./Quote";
 
 
