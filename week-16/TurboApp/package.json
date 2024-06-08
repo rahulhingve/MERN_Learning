@@ -1,5 +1,5 @@
 {
-  "name": "TurboRepo",
+  "name": "turboApp",
   "private": true,
   "scripts": {
     "build": "turbo build",
